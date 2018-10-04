@@ -2,8 +2,6 @@
 "=====>> Shared configuration
 "================================================
 function SharedConfiguration()
-  let g:mapleader=" "
-
   set nocompatible
   set encoding=utf-8
 
@@ -90,6 +88,12 @@ function SharedConfiguration()
 
   command -range Order <line1>,<line2>call SortByLength()
 
+
+  "=======================
+  "=>> Misc
+  "=======================
+  set timeout timeoutlen=200 ttimeoutlen=200
+
 endfunction
 
 
@@ -116,12 +120,11 @@ function Vim8Plugins()
     Plug '/usr/local/opt/fzf'
     Plug 'junegunn/fzf.vim'
     command! -bang -nargs=* Rg
-    \ call fzf#vim#grep(
-    \   'rg --column --line-number --hidden --ignore-case --no-heading --color=always '.shellescape(<q-args>), 1,
-    \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
-    \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
-    \   <bang>0)
-    
+          \ call fzf#vim#grep(
+          \   'rg --column --line-number --hidden --ignore-case --no-heading --color=always '.shellescape(<q-args>), 1,
+          \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
+          \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
+          \   <bang>0)
     
     "=======================
     "=>> Prettier
@@ -246,12 +249,17 @@ function NeovimPlugins()
 
       call dein#add('zchee/deoplete-jedi') " Python
 
-
       " Fuzzyfinder
-      call dein#add('Shougo/denite.nvim')
+      " call dein#add('Shougo/denite.nvim')
+      call dein#add('/usr/local/opt/fzf')
+      call dein#add('junegunn/fzf.vim')
 
       " Prettier
       call dein#add('prettier/vim-prettier')
+      call dein#add('mindriot101/vim-yapf')
+
+      " Auto Pairs
+      call dein#add('jiangmiao/auto-pairs')
       
       " Shell Integration (Deol)
       call dein#add('Shougo/deol.nvim')
@@ -273,6 +281,11 @@ endfunction
 "================================================
 function NeovimConfiguration()
   "=======================
+  "=>> Dein
+  "=======================
+  nnoremap <Leader>du :call dein#update()<Cr>
+  
+  "=======================
   "=>> Deoplete
   "=======================
   let g:deoplete#enable_at_startup = 1
@@ -284,38 +297,61 @@ function NeovimConfiguration()
   autocmd BufWritePre *.js,*.jsx,*.graphql,*.css PrettierAsync
 
   "=======================
-  "=>> Denite
-  "
-  "= <C-p> denite-search
-  "= <C-j> denite-line-down
-  "= <C-k> denite-line-uo
+  "=>> Yapf
   "=======================
-  nnoremap <C-p> :Denite buffer file/rec<Cr>
-   
-  call denite#custom#var('file/rec', 'command',
-        \ ['rg', '--files', '--glob', '!.git'])
+  nnoremap <leader>y :Yapf<cr>
+
+  "=======================
+  "=>> Fzf
+  "=======================
+  command! -bang -nargs=* Rg
+        \ call fzf#vim#grep(
+        \   'rg --column --line-number --hidden --ignore-case --no-heading --color=always '.shellescape(<q-args>), 1,
+        \   <bang>0 ? fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'up:60%')
+        \           : fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}, 'right:50%:hidden', '?'),
+        \   <bang>0)
+
+  let g:fzf_layout = { 'window': 'enew' }
+  let g:fzf_layout = { 'window': '-tabnew' }
+  let g:fzf_layout = { 'window': '30split enew' }
+  let g:fzf_history_dir = '~/.local/share/fzf-history'
+  let g:fzf_buffers_jump = 1
+
+
+  nnoremap <C-g> :Rg<Cr>
+  nnoremap <C-p> :Files<Cr>
+
+  "=======================
+  "=>> Denite
+  "=======================
+  "nnoremap <C-p> :Denite buffer file/rec<Cr>
+  "
+  "call denite#custom#var('file/rec', 'command',
+        "\ ['rg', '--files', '--glob', '!.git'])
   " next line
-  call denite#custom#map('insert', '<C-j>',
-        \ '<denite:move_to_next_line>', 'noremap')
+  "call denite#custom#map('insert', '<C-j>',
+        "\ '<denite:move_to_next_line>', 'noremap')
   " prev line
-  call denite#custom#map('insert', '<C-k>',
-        \ '<denite:move_to_previous_line>', 'noremap')
+  "call denite#custom#map('insert', '<C-k>',
+        "\ '<denite:move_to_previous_line>', 'noremap')
   " top
-  call denite#custom#map('insert', '<C-h>',
-        \ '<denite:move_to_top>', 'noremap')
+  "call denite#custom#map('insert', '<C-h>',
+        "\ '<denite:move_to_top>', 'noremap')
   " bottom
-  call denite#custom#map('insert', '<C-l>',
-        \ '<denite:move_to_bottom>', 'noremap')
+  "call denite#custom#map('insert', '<C-l>',
+        "\ '<denite:move_to_bottom>', 'noremap')
   " filter
-  call denite#custom#filter('matcher/ignore_globs', 'ignore_globs',
-        \ [ '.git/', '*.graphql.*', 'node_modules/',
-        \   'images/', '*.min.*', 'img/', 'fonts/'])
+  "call denite#custom#filter('matcher/ignore_globs', 'ignore_globs',
+        "\ [ '.git/', '*.graphql.*', 'node_modules/',
+        "\   'images/', '*.min.*', 'img/', 'fonts/'])
 endfunction
 
 "================================================
 "=====>> Initialize .vimrc
 "================================================
 function Initialize()
+  let g:mapleader=" "
+
   if has('nvim')
     call NeovimPlugins() 
     call NeovimConfiguration()
