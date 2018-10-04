@@ -15,14 +15,14 @@ function SharedConfiguration()
   " Gruvbox
   colorscheme gruvbox
   let g:gruvbox_invert_selection = 0
-  let g:gruvbox_contrast_dark = "soft"
+  let g:gruvbox_contrast_dark = "hard"
 
   "=======================
   "=>> Spacing
   "=======================
   set smarttab
   set expandtab
-  set tabstop=4
+  set tabstop=2
   set shiftwidth=2
   set softtabstop=0
   set softtabstop=2
@@ -54,6 +54,7 @@ function SharedConfiguration()
   set hlsearch
   set showmatch
   set incsearch
+  nnoremap <silent> <Leader>/ :nohlsearch<Cr>
   
   " Statusline
   set showcmd
@@ -73,8 +74,8 @@ function SharedConfiguration()
   "=======================
   "=>> Splits
   "=======================
-  nnoremap <Leader>ss :sp %:h/
-  nnoremap <Leader>vs :vsp %:h/
+  nnoremap <Leader>h :sp %:h/
+  nnoremap <Leader>v :vsp %:h/
 
   "=======================
   "=>> Functions
@@ -83,16 +84,18 @@ function SharedConfiguration()
     execute a:firstline . "," . a:lastline . 's/^\(.*\)$/\=strdisplaywidth( submatch(0) ) . " " . submatch(0)/'
     execute a:firstline . "," . a:lastline . 'sort n'
     execute a:firstline . "," . a:lastline . 's/^\d\+\s//'
-    call feedkeys("\<CR>")
+    call feedkeys("\<Cr>")
   endfunction
 
   command -range Order <line1>,<line2>call SortByLength()
-
+  xnoremap <Leader>o :Order<Cr>
 
   "=======================
   "=>> Misc
   "=======================
-  set timeout timeoutlen=200 ttimeoutlen=200
+  set timeout
+  set timeoutlen=100
+  set ttimeoutlen=100
 
 endfunction
 
@@ -208,18 +211,18 @@ function Vim8Configuration()
   "=>> Bindings
   "=======================
   " agvi buffer
-  nnoremap <Left> :N<CR>
-  nnoremap <Right> :n<CR>
-  vnoremap // y/<C-R>"<CR>
+  nnoremap <Left> :N<Cr>
+  nnoremap <Right> :n<Cr>
+  vnoremap // y/<C-R>"<Cr>
 
   " Fuzzyfinder
   nnoremap <C-g> :Rg<Cr>
   nnoremap <C-p> :Files<Cr>
 
   " Leader
-  nnoremap <Leader>bb :ls<CR>:b<Space>
-  nnoremap <Leader>bd :w<CR>:bd<Space>
-  nnoremap <Leader>df :YcmCompleter GoToDefinition<CR>
+  nnoremap <Leader>bb :ls<Cr>:b<Space>
+  nnoremap <Leader>bd :w<Cr>:bd<Space>
+  nnoremap <Leader>df :YcmCompleter GoToDefinition<Cr>
 endfunction
 
 "================================================
@@ -229,9 +232,8 @@ function NeovimPlugins()
   set runtimepath+=~/.cache/dein/repos/github.com/Shougo/dein.vim
 
   if dein#load_state('~/.cache/dein')
-    call dein#begin('~/.cache/dein')
-      call dein#add('~/.cache/dein')
-
+	call dein#begin('~/.cache/dein')
+    call dein#add('~/.cache/dein')
       " Themes
       call dein#add('morhetz/gruvbox')
       call dein#add('trevordmiller/nova-vim')
@@ -242,26 +244,33 @@ function NeovimPlugins()
             \ 'lazy' : 1, 'on_i' : 1,
             \ })
 
-      call dein#add('carlitux/deoplete-ternjs') " Javascript
+      call dein#add('zchee/deoplete-jedi')
+      call dein#add('carlitux/deoplete-ternjs')
       call dein#config('deoplete-ternjs', {
             \ 'do': 'npm install -g tern'
             \ })
+	
+      " Linting
+      call dein#add('w0rp/ale')
+      
+      " Formatting
+      call dein#add('prettier/vim-prettier')
 
-      call dein#add('zchee/deoplete-jedi') " Python
+      " Filetree
+      call dein#add('Shougo/defx.nvim')
 
-      " Fuzzyfinder
-      " call dein#add('Shougo/denite.nvim')
+      " Statusline
+      call dein#add('vim-airline/vim-airline')
+      call dein#add('vim-airline/vim-airline-themes')
+
+      " Fuzzyfilter
       call dein#add('/usr/local/opt/fzf')
       call dein#add('junegunn/fzf.vim')
-
-      " Prettier
-      call dein#add('prettier/vim-prettier')
-      call dein#add('mindriot101/vim-yapf')
 
       " Auto Pairs
       call dein#add('jiangmiao/auto-pairs')
       
-      " Shell Integration (Deol)
+      " Shell integration
       call dein#add('Shougo/deol.nvim')
 
       " Lang
@@ -297,9 +306,39 @@ function NeovimConfiguration()
   autocmd BufWritePre *.js,*.jsx,*.graphql,*.css PrettierAsync
 
   "=======================
-  "=>> Yapf
+  "=>> Airline
   "=======================
-  nnoremap <leader>y :Yapf<cr>
+  let g:airline_theme = 'gruvbox'
+  let g:airline_powerline_fonts = 1
+  let g:airline#extensions#ale#enabled = 1
+
+  "=======================
+  "=>> Ale
+  "=======================
+  let g:ale_sign_error = '✗'
+  let g:ale_sign_warning = '⚠'
+  let g:ale_sign_column_always = 1
+  let g:ale_linters = {
+        \  'vim': ['vint'],
+        \  'jsx': ['eslint'],
+        \  'json': ['fixjson', 'jsonlint'],
+        \  'javascript': ['eslint', 'prettier'],
+        \  'python': ['pycodestyle', 'flake8', 'pylint'],
+        \}
+  let g:ale_fixers = {
+        \ 'reason': ['refmt'],
+        \ 'python': ['autopep8', 'yapf', 'isort'],
+        \ }
+  
+   nnoremap <Leader>l :ALEFix<Cr>
+
+  "=======================
+  "=>> Defx
+  "=======================
+  let g:vimfiler_as_default_explorer = 1
+
+  autocmd FileType defx call s:get_defx_settings()
+  nnoremap <C-b> :Defx -split=vertical -winwidth=50 -direction=topleft -toggle=true<Cr>
 
   "=======================
   "=>> Fzf
@@ -320,30 +359,6 @@ function NeovimConfiguration()
 
   nnoremap <C-g> :Rg<Cr>
   nnoremap <C-p> :Files<Cr>
-
-  "=======================
-  "=>> Denite
-  "=======================
-  "nnoremap <C-p> :Denite buffer file/rec<Cr>
-  "
-  "call denite#custom#var('file/rec', 'command',
-        "\ ['rg', '--files', '--glob', '!.git'])
-  " next line
-  "call denite#custom#map('insert', '<C-j>',
-        "\ '<denite:move_to_next_line>', 'noremap')
-  " prev line
-  "call denite#custom#map('insert', '<C-k>',
-        "\ '<denite:move_to_previous_line>', 'noremap')
-  " top
-  "call denite#custom#map('insert', '<C-h>',
-        "\ '<denite:move_to_top>', 'noremap')
-  " bottom
-  "call denite#custom#map('insert', '<C-l>',
-        "\ '<denite:move_to_bottom>', 'noremap')
-  " filter
-  "call denite#custom#filter('matcher/ignore_globs', 'ignore_globs',
-        "\ [ '.git/', '*.graphql.*', 'node_modules/',
-        "\   'images/', '*.min.*', 'img/', 'fonts/'])
 endfunction
 
 "================================================
@@ -363,3 +378,57 @@ function Initialize()
 endfunction
 
 call Initialize()
+
+
+"================================================
+"=====>> Defx settings
+"================================================
+function! s:get_defx_settings() abort
+  " Define mappings
+  nnoremap <silent><buffer><expr> <Cr>
+  \ defx#do_action('open')
+  nnoremap <silent><buffer><expr> c
+  \ defx#do_action('copy')
+  nnoremap <silent><buffer><expr> m
+  \ defx#do_action('move')
+  nnoremap <silent><buffer><expr> p
+  \ defx#do_action('paste')
+  nnoremap <silent><buffer><expr> l
+  \ defx#do_action('open')
+  nnoremap <silent><buffer><expr> E
+  \ defx#do_action('open', 'vsplit')
+  nnoremap <silent><buffer><expr> P
+  \ defx#do_action('open', 'pedit')
+  nnoremap <silent><buffer><expr> K
+  \ defx#do_action('new_directory')
+  nnoremap <silent><buffer><expr> N
+  \ defx#do_action('new_file')
+  nnoremap <silent><buffer><expr> d
+  \ defx#do_action('remove')
+  nnoremap <silent><buffer><expr> r
+  \ defx#do_action('rename')
+  nnoremap <silent><buffer><expr> x
+  \ defx#do_action('execute_system')
+  nnoremap <silent><buffer><expr> yy
+  \ defx#do_action('yank_path')
+  nnoremap <silent><buffer><expr> .
+  \ defx#do_action('toggle_ignored_files')
+  nnoremap <silent><buffer><expr> h
+  \ defx#do_action('cd', ['..'])
+  nnoremap <silent><buffer><expr> ~
+  \ defx#do_action('cd')
+  nnoremap <silent><buffer><expr> q
+  \ defx#do_action('quit')
+  nnoremap <silent><buffer><expr> <Space>
+  \ defx#do_action('toggle_select') . 'j'
+  nnoremap <silent><buffer><expr> *
+  \ defx#do_action('toggle_select_all')
+  nnoremap <silent><buffer><expr> j
+  \ line('.') == line('$') ? 'gg' : 'j'
+  nnoremap <silent><buffer><expr> k
+  \ line('.') == 1 ? 'G' : 'k'
+  nnoremap <silent><buffer><expr> <C-l>
+  \ defx#do_action('redraw')
+  nnoremap <silent><buffer><expr> <C-g>
+  \ defx#do_action('print')
+endfunction
