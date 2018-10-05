@@ -94,8 +94,8 @@ function SharedConfiguration()
   "=>> Misc
   "=======================
   set timeout
-  set timeoutlen=100
-  set ttimeoutlen=100
+  set ttimeoutlen=0
+  set timeoutlen=500
 
 endfunction
 
@@ -256,6 +256,9 @@ function NeovimPlugins()
       " Formatting
       call dein#add('prettier/vim-prettier')
 
+      " Motion / Code navigation
+      call dein#add('justinmk/vim-sneak')
+
       " Filetree
       call dein#add('Shougo/defx.nvim')
 
@@ -304,6 +307,16 @@ function NeovimConfiguration()
   "=======================
   let g:prettier#autoformat = 1
   autocmd BufWritePre *.js,*.jsx,*.graphql,*.css PrettierAsync
+
+  "=======================
+  "=>> Sneak
+  "=======================
+  let g:sneak#label = 1
+
+  map f <Plug>Sneak_f
+  map F <Plug>Sneak_F
+  map t <Plug>Sneak_t
+  map T <Plug>Sneak_T
 
   "=======================
   "=>> Airline
