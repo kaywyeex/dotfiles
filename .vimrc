@@ -2,8 +2,10 @@
 "=====>> Shared configuration
 "================================================
 function SharedConfiguration()
+  set hidden
   set nocompatible
   set encoding=utf-8
+  set clipboard=unnamed
 
   "=======================
   "=>> Colors
@@ -96,6 +98,8 @@ function SharedConfiguration()
   set timeout
   set ttimeoutlen=0
   set timeoutlen=500
+
+  vnoremap <Leader>/ y/\V<C-r>"<Cr>
 
 endfunction
 
@@ -252,6 +256,7 @@ function NeovimPlugins()
 	
       " Linting
       call dein#add('w0rp/ale')
+      "call dein#add('neomake/neomake')
       
       " Formatting
       call dein#add('prettier/vim-prettier')
@@ -306,7 +311,7 @@ function NeovimConfiguration()
   "=>> Prettier
   "=======================
   let g:prettier#autoformat = 1
-  autocmd BufWritePre *.js,*.jsx,*.graphql,*.css PrettierAsync
+  autocmd BufWritePre *.html,*.js,*.jsx,*.graphql,*.css PrettierAsync
 
   "=======================
   "=>> Sneak
@@ -328,6 +333,8 @@ function NeovimConfiguration()
   "=======================
   "=>> Ale
   "=======================
+  "call neomake#configure#automake('w')
+  let b:ale_fix_on_save = 1
   let g:ale_sign_error = '✗'
   let g:ale_sign_warning = '⚠'
   let g:ale_sign_column_always = 1
@@ -336,14 +343,17 @@ function NeovimConfiguration()
         \  'jsx': ['eslint'],
         \  'json': ['fixjson', 'jsonlint'],
         \  'javascript': ['eslint', 'prettier'],
-        \  'python': ['pycodestyle', 'flake8', 'pylint'],
+        \  'python': ['autopep8', 'pycodestyle', 'pylint'],
         \}
   let g:ale_fixers = {
         \ 'reason': ['refmt'],
-        \ 'python': ['autopep8', 'yapf', 'isort'],
+        \ 'python': ['autopep8', 'isort', 'black', 'yapf'],
         \ }
-  
-   nnoremap <Leader>l :ALEFix<Cr>
+
+  let g:ale_python_pylint_options = '--disable=missing-docstring --load-plugins pylint_django'
+
+  nnoremap <Leader>l :ALEFix<Cr>
+  nnoremap <Leader>df :ALEGoToDefinition<Cr>
 
   "=======================
   "=>> Defx
