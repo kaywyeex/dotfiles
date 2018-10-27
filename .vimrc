@@ -76,6 +76,8 @@ function SharedConfiguration()
   "=======================
   "=>> Splits
   "=======================
+  set splitbelow
+  set splitright
   nnoremap <Leader>h :sp %:h/
   nnoremap <Leader>v :vsp %:h/
 
@@ -341,6 +343,7 @@ function NeovimConfiguration()
   let g:ale_linters = {
         \  'vim': ['vint'],
         \  'jsx': ['eslint'],
+        \  'sh': ['language-server'],
         \  'json': ['fixjson', 'jsonlint'],
         \  'javascript': ['eslint', 'prettier'],
         \  'python': ['autopep8', 'pycodestyle', 'pylint'],
