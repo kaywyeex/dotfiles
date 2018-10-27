@@ -1,0 +1,21 @@
+[diff]
+  tool = vimdiff
+
+[help]
+  autocorrect = 1
+
+[merge]
+  log = true
+
+[core]
+  trustctime = false 
+  untrackedCache = true 
+  precomposeunicode = false 
+
+[alias]
+  st = status
+  cm = commit -m 
+  ud = commit --amend --no-edit
+  lg = log --graph --oneline --decorate --all
+  new = "!git push -u origin $(git rev-parse --abbrev-ref HEAD)"
+  go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
