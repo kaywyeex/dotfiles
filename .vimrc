@@ -1,9 +1,18 @@
+
 "================================================
 "=====>> Shared configuration
 "================================================
 function SharedConfiguration()
-  set hidden
   set nocompatible
+
+  filetype plugin on
+  filetype indent on
+  "autocmd filetype cs set expandtab
+
+  set hidden
+  set nowrap
+  set nobackup
+  set noswapfile
   set encoding=utf-8
   set clipboard=unnamed
 
@@ -25,6 +34,8 @@ function SharedConfiguration()
   set smarttab
   set expandtab
   set tabstop=2
+  set autoindent
+  set copyindent
   set shiftwidth=2
   set softtabstop=0
   set softtabstop=2
@@ -45,8 +56,9 @@ function SharedConfiguration()
   "=======================
   "=>> Interface
   "=======================
+  "set cursorline
   set ruler
-  set number relativenumber
+  set number "relativenumber
   
   " Wildmenu
   set wildmenu
@@ -56,6 +68,7 @@ function SharedConfiguration()
   set hlsearch
   set showmatch
   set incsearch
+  set smartcase
   nnoremap <silent> <Leader>/ :nohlsearch<Cr>
   
   " Statusline
@@ -140,7 +153,7 @@ function Vim8Plugins()
     "=======================
     Plug 'prettier/vim-prettier', {
       \ 'do': 'yarn install',
-      \ 'for': ['javascript', 'css', 'graphql'] }
+      \ 'for': ['javascript', 'typescript', 'css', 'graphql'] }
     
     let g:prettier#autoformat = 0
     autocmd BufWritePre *.js,*.jsx,*.graphql,*.css PrettierAsync
@@ -158,7 +171,6 @@ function Vim8Plugins()
     let g:ale_sign_error = '✘'
     let g:ale_sign_warning = '⚠'
     let g:ale_fixers = {
-      \  'html':      ['tidy'],
       \ 'markdown':   ['prettier'],
       \ 'reason':     ['refmt'],
       \ 'javascript': ['eslint'],
@@ -285,6 +297,10 @@ function NeovimPlugins()
 
       " Lang
       call dein#add('sheerun/vim-polyglot')
+      call dein#add('OmniSharp/omnisharp-vim')
+
+      " git
+      call dein#add('tpope/vim-fugitive')
 
       call dein#end()
     call dein#save_state()
@@ -313,7 +329,7 @@ function NeovimConfiguration()
   "=>> Prettier
   "=======================
   let g:prettier#autoformat = 1
-  autocmd BufWritePre *.html,*.js,*.jsx,*.graphql,*.css PrettierAsync
+  autocmd BufWritePre *.html,*.js,*.jsx,*.ts,*.tsx,*.graphql,*.css PrettierAsync
 
   "=======================
   "=>> Sneak
@@ -341,6 +357,7 @@ function NeovimConfiguration()
   let g:ale_sign_warning = '⚠'
   let g:ale_sign_column_always = 1
   let g:ale_linters = {
+        \  'cs': ['Omnisharp'],
         \  'vim': ['vint'],
         \  'jsx': ['eslint'],
         \  'sh': ['language-server'],
@@ -350,7 +367,7 @@ function NeovimConfiguration()
         \}
   let g:ale_fixers = {
         \ 'reason': ['refmt'],
-        \ 'python': ['autopep8', 'isort', 'black', 'yapf'],
+        \ 'python': ['autopep8', 'isort'],
         \ }
 
   let g:ale_python_pylint_options = '--disable=missing-docstring --load-plugins pylint_django'
